@@ -54,6 +54,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.oblab.toiletmap.data.formatDistance
 import com.oblab.toiletmap.ui.theme.DividerColor
 import com.oblab.toiletmap.ui.theme.Fill
 import com.oblab.toiletmap.ui.theme.Green
@@ -66,7 +67,8 @@ data class PlaceListItem(
     val id: String,
     val name: String?,
     val address: String?,
-    val distanceMeters: Int,
+    /** 내 위치를 모르면 null */
+    val distanceMeters: Int?,
     val lastVisitedAt: Long,
     val visitCount: Int,
 )
@@ -81,7 +83,7 @@ internal fun filterAndSort(places: List<PlaceListItem>, query: String, sort: Pla
     }
     return when (sort) {
         PlaceSort.RECENT -> found.sortedByDescending { it.lastVisitedAt }
-        PlaceSort.NEAREST -> found.sortedBy { it.distanceMeters }
+        PlaceSort.NEAREST -> found.sortedBy { it.distanceMeters ?: Int.MAX_VALUE }
     }
 }
 
@@ -228,7 +230,9 @@ private fun PlaceRow(place: PlaceListItem, query: String, onClick: () -> Unit) {
                 )
             }
             Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(formatDistance(place.distanceMeters), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Ink)
+                place.distanceMeters?.let {
+                    Text(formatDistance(it.toDouble()), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Ink)
+                }
                 Text(
                     "${DateUtils.getRelativeTimeSpanString(place.lastVisitedAt)} · ${place.visitCount}회",
                     fontSize = 12.sp,
@@ -247,7 +251,6 @@ private fun highlight(text: String, query: String): AnnotatedString = buildAnnot
     if (start >= 0) addStyle(SpanStyle(background = GreenTint, color = GreenDark), start, start + query.length)
 }
 
-private fun formatDistance(meters: Int) = if (meters < 1000) "${meters}m" else "%.1fkm".format(meters / 1000f)
 
 private val PreviewPlaces: List<PlaceListItem> = run {
     val now = System.currentTimeMillis()

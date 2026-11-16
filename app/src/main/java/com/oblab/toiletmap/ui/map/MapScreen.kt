@@ -2,6 +2,7 @@ package com.oblab.toiletmap.ui.map
 
 import android.location.Location
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,13 +13,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
@@ -28,6 +29,8 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,13 +53,13 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kakao.vectormap.KakaoMap
+import com.oblab.toiletmap.R
 import com.oblab.toiletmap.ui.theme.DividerColor
 import com.oblab.toiletmap.ui.theme.Fill
 import com.oblab.toiletmap.ui.theme.Green
@@ -83,56 +86,119 @@ fun MapScreen(
     selected: PlaceDetail?,
     pins: List<MapPin> = emptyList(),
     myLocation: Location? = null,
+    cameraTarget: CameraTarget? = null,
+    editingLocation: Boolean = false,
     onPinClick: (String) -> Unit = {},
     onMyLocationClick: () -> Unit = {},
     onRegisterClick: () -> Unit = {},
+    onListClick: () -> Unit = {},
+    sheetActions: PlaceSheetActions = PlaceSheetActions(),
+    onConfirmLocation: () -> Unit = {},
+    onCancelEditLocation: () -> Unit = {},
+    onMapReady: (KakaoMap) -> Unit = {},
 ) {
     Box(Modifier.fillMaxSize()) {
         // Preview는 네이티브 지도를 못 그려서 그림으로 대신한다
         if (LocalInspectionMode.current) {
             MapPlaceholder(hasSelection = selected != null, modifier = Modifier.fillMaxSize())
         } else {
-            KakaoMapView(pins, myLocation, onPinClick, Modifier.fillMaxSize())
+            KakaoMapView(pins, myLocation, cameraTarget, onPinClick, Modifier.fillMaxSize(), onMapReady)
         }
-        TopBar(Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(16.dp))
+
+        if (editingLocation) {
+            // 지도 중앙 고정 핀: 핀 끝이 화면 중앙(카메라 위치)에 오도록 반 높이만큼 올린다
+            Image(
+                painterResource(R.drawable.ic_map_pin),
+                contentDescription = "새 위치",
+                modifier = Modifier.align(Alignment.Center).offset(y = (-18).dp).size(28.dp, 36.dp),
+            )
+            Text(
+                "지도를 움직여 핀을 화장실 위치에 맞추세요",
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .statusBarsPadding()
+                    .padding(16.dp)
+                    .background(Color.White, RoundedCornerShape(24.dp))
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                fontSize = 15.sp,
+                color = Ink,
+            )
+        } else {
+            TopBar(onListClick, Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(16.dp))
+        }
+
         Column(
             Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
             horizontalAlignment = Alignment.End,
         ) {
             RoundIconButton(Icons.Default.LocationOn, "내 위치로 이동", Modifier.padding(16.dp), tint = MyBlue, onClick = onMyLocationClick)
-            if (selected == null) RegisterButton(onRegisterClick) else PlaceSheet(selected)
+            when {
+                editingLocation -> EditLocationBar(onCancelEditLocation, onConfirmLocation)
+                selected == null -> RegisterButton(onRegisterClick)
+                else -> PlaceSheet(selected, sheetActions)
+            }
+        }
+    }
+}
+
+/** 하단 시트 버튼 동작. */
+class PlaceSheetActions(
+    val onEditLocation: () -> Unit = {},
+    val onAddVisit: () -> Unit = {},
+    val onEditInfo: () -> Unit = {},
+    val onDelete: () -> Unit = {},
+)
+
+@Composable
+private fun EditLocationBar(onCancel: () -> Unit, onConfirm: () -> Unit) {
+    Row(
+        Modifier
+            .navigationBarsPadding()
+            .padding(start = 16.dp, end = 16.dp, bottom = 24.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        OutlinedButton(
+            onClick = onCancel,
+            modifier = Modifier.weight(1f).height(56.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White),
+        ) {
+            Text("취소", color = Ink)
+        }
+        Button(
+            onClick = onConfirm,
+            modifier = Modifier.weight(1f).height(56.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Green),
+        ) {
+            Text("이 위치로 저장", fontWeight = FontWeight.Bold)
         }
     }
 }
 
 @Composable
-private fun TopBar(modifier: Modifier = Modifier) {
-    var query by remember { mutableStateOf("") }
+private fun TopBar(onListClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Surface(Modifier.weight(1f).height(48.dp), shape = CircleShape, color = Color.White, shadowElevation = 4.dp) {
+        // 검색은 목록 화면에서 한다. 여기선 누르면 목록 화면으로 이동
+        Surface(
+            onClick = onListClick,
+            modifier = Modifier.weight(1f).height(48.dp),
+            shape = CircleShape,
+            color = Color.White,
+            shadowElevation = 4.dp,
+        ) {
             Row(Modifier.padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Search, contentDescription = null, tint = SubText)
                 Spacer(Modifier.width(8.dp))
-                BasicTextField(
-                    value = query,
-                    onValueChange = { query = it },
-                    modifier = Modifier.weight(1f).semantics { contentDescription = "장소 검색" },
-                    singleLine = true,
-                    textStyle = TextStyle(fontSize = 15.sp, color = Ink),
-                    decorationBox = { inner ->
-                        Box {
-                            if (query.isEmpty()) Text("이름·주소 검색", color = SubText, fontSize = 15.sp)
-                            inner()
-                        }
-                    },
-                )
+                Text("이름·주소 검색", color = SubText, fontSize = 15.sp)
             }
         }
-        RoundIconButton(Icons.AutoMirrored.Filled.List, "목록 보기")
+        RoundIconButton(Icons.AutoMirrored.Filled.List, "목록 보기", onClick = onListClick)
         RoundIconButton(Icons.Default.Settings, "설정")
     }
 }
@@ -169,8 +235,9 @@ private fun RegisterButton(onClick: () -> Unit) {
 }
 
 @Composable
-private fun PlaceSheet(place: PlaceDetail) {
+private fun PlaceSheet(place: PlaceDetail, actions: PlaceSheetActions) {
     var showPassword by remember(place) { mutableStateOf(false) }
+    var menuOpen by remember { mutableStateOf(false) }
     Surface(
         Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
@@ -186,9 +253,33 @@ private fun PlaceSheet(place: PlaceDetail) {
             Row(verticalAlignment = Alignment.Top) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(place.name, fontSize = 21.sp, fontWeight = FontWeight.Bold, color = Ink)
-                    Text("${place.address} · ${place.distance}", fontSize = 14.sp, color = SubText)
+                    Text(
+                        listOf(place.address, place.distance).filter { it.isNotEmpty() }.joinToString(" · "),
+                        fontSize = 14.sp,
+                        color = SubText,
+                    )
                 }
-                IconButton(onClick = {}) { Icon(Icons.Default.MoreVert, "더보기 (이름 변경, 삭제)", tint = SubText) }
+                Box {
+                    IconButton(onClick = { menuOpen = true }) {
+                        Icon(Icons.Default.MoreVert, "더보기 (정보 편집, 삭제)", tint = SubText)
+                    }
+                    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                        DropdownMenuItem(
+                            text = { Text("이름·비밀번호·메모 편집") },
+                            onClick = {
+                                menuOpen = false
+                                actions.onEditInfo()
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text("삭제", color = Color(0xFFB3261E)) },
+                            onClick = {
+                                menuOpen = false
+                                actions.onDelete()
+                            },
+                        )
+                    }
+                }
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -225,11 +316,11 @@ private fun PlaceSheet(place: PlaceDetail) {
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = {}, modifier = Modifier.weight(1f).height(52.dp), shape = RoundedCornerShape(14.dp)) {
+                OutlinedButton(onClick = actions.onEditLocation, modifier = Modifier.weight(1f).height(52.dp), shape = RoundedCornerShape(14.dp)) {
                     Text("위치 수정", color = Ink)
                 }
                 Button(
-                    onClick = {},
+                    onClick = actions.onAddVisit,
                     modifier = Modifier.weight(1f).height(52.dp),
                     shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Green),

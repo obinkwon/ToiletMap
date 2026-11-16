@@ -30,17 +30,23 @@ import com.oblab.toiletmap.R
 
 data class MapPin(val id: String, val latitude: Double, val longitude: Double)
 
+/** 카메라 이동 요청. data class가 아니라서 같은 좌표로 다시 만들어도 새 요청으로 본다. */
+class CameraTarget(val latitude: Double, val longitude: Double)
+
 /** 카카오맵 MapView를 Compose에 붙인다. 핀을 누르면 [onPinClick]에 장소 id를 넘긴다. */
 @Composable
 fun KakaoMapView(
     pins: List<MapPin>,
     myLocation: Location?,
+    cameraTarget: CameraTarget?,
     onPinClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    onMapReady: (KakaoMap) -> Unit = {},
 ) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val currentOnPinClick by rememberUpdatedState(onPinClick)
+    val currentOnMapReady by rememberUpdatedState(onMapReady)
     var kakaoMap by remember { mutableStateOf<KakaoMap?>(null) }
 
     val mapView = remember {
@@ -61,6 +67,7 @@ fun KakaoMapView(
                             true // 클릭 처리함: 지도 클릭으로 넘기지 않음
                         }
                         kakaoMap = map
+                        currentOnMapReady(map)
                     }
                 },
             )
@@ -95,12 +102,12 @@ fun KakaoMapView(
         }
     }
 
-    // 새 위치를 받을 때마다(같은 자리여도) 그 위치로 카메라 이동
-    LaunchedEffect(kakaoMap, myLocation) {
+    // 새 목표가 올 때마다(같은 자리여도) 이동. 지도가 다시 만들어지면 마지막 목표로 다시 이동
+    LaunchedEffect(kakaoMap, cameraTarget) {
         val map = kakaoMap ?: return@LaunchedEffect
-        val location = myLocation ?: return@LaunchedEffect
+        val target = cameraTarget ?: return@LaunchedEffect
         map.moveCamera(
-            CameraUpdateFactory.newCenterPosition(LatLng.from(location.latitude, location.longitude), 16),
+            CameraUpdateFactory.newCenterPosition(LatLng.from(target.latitude, target.longitude), 16),
             CameraAnimation.from(300),
         )
     }
