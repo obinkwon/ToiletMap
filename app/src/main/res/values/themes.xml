@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.ToiletMap" parent="@android:style/Theme.Material.Light.NoActionBar" />
+
+    <!-- 위젯 등록 얼럿용: 뒤 화면(홈)이 그대로 보이는 투명 화면 -->
+    <style name="Theme.ToiletMap.Translucent" parent="@android:style/Theme.Translucent.NoTitleBar" />
 </resources>

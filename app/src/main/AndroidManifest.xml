@@ -19,6 +19,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- 위젯 탭 → 앱 전체가 아니라 얼럿만 뜨는 투명 화면. 최근 앱 목록에 안 남고 앱 화면과 섞이지 않게 별도 task -->
+        <activity
+            android:name=".widget.WidgetRegisterActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.ToiletMap.Translucent" />
+
+        <receiver
+            android:name=".widget.RegisterWidgetReceiver"
+            android:exported="true"
+            android:label="화장실 등록">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/register_widget_info" />
+        </receiver>
     </application>
 
 </manifest>
