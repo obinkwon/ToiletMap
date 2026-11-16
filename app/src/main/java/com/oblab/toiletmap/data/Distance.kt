@@ -17,9 +17,15 @@ fun distanceMeters(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Doub
     return 2 * 6_371_000.0 * asin(sqrt(a))
 }
 
-/** [radiusM] 안에서 가장 가까운 장소와 거리. 없으면 null. */
-fun List<PlaceWithStats>.nearestWithin(lat: Double, lng: Double, radiusM: Double = DUPLICATE_RADIUS_M): Pair<PlaceWithStats, Double>? =
-    map { it to distanceMeters(lat, lng, it.latitude, it.longitude) }
+/** [radiusM] 안에서 가장 가까운 장소와 거리. [excludeId] 장소(자기 자신)는 뺀다. 없으면 null. */
+fun List<PlaceWithStats>.nearestWithin(
+    lat: Double,
+    lng: Double,
+    radiusM: Double = DUPLICATE_RADIUS_M,
+    excludeId: String? = null,
+): Pair<PlaceWithStats, Double>? =
+    filter { it.id != excludeId }
+        .map { it to distanceMeters(lat, lng, it.latitude, it.longitude) }
         .filter { it.second <= radiusM }
         .minByOrNull { it.second }
 

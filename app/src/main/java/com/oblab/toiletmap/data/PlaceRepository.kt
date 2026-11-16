@@ -72,6 +72,25 @@ class PlaceRepository(
         refreshWidget()
     }
 
+    suspend fun uncheckedIds(): List<String> = dao.uncheckedIds()
+
+    /** 합칠 필요 없음(또는 사용자가 따로 두기로 함). 다시 묻지 않는다. */
+    suspend fun markDupChecked(placeId: String) = dao.markDupChecked(placeId, System.currentTimeMillis())
+
+    /** 위젯으로 등록한 [fromId]를 이전 장소 [toId]로 합친다. */
+    suspend fun merge(fromId: String, toId: String) = dao.merge(fromId, toId, System.currentTimeMillis())
+
+    suspend fun exportBackup(): String =
+        toBackupJson(dao.allPlaces(), dao.allVisits(), System.currentTimeMillis())
+
+    /** 백업을 가져오고 가져온 장소 수를 돌려준다. 파일이 잘못되면 예외(메시지는 사용자용). */
+    suspend fun importBackup(json: String): Int {
+        val data = parseBackup(json)
+        dao.importBackup(data.places, data.visits)
+        refreshWidget()
+        return data.places.size
+    }
+
     /** 홈 화면 위젯의 "마지막 등록" 시각을 다시 그린다. */
     private fun refreshWidget() {
         appScope.launch { RegisterWidget().updateAll(context) }

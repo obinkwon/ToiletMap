@@ -2,6 +2,7 @@ package com.oblab.toiletmap.ui.map
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.widget.Toast
@@ -15,6 +16,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+
+/** 정확한 위치(FINE)를 거절해도 대략적 위치(COARSE)만 있으면 동작하므로 COARSE로 판단. */
+fun hasLocationPermission(context: Context) =
+    ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
 /**
  * 현재 위치를 한 번 받아오는 함수를 돌려준다.
@@ -46,10 +51,7 @@ fun rememberMyLocationRequester(onLocation: (Location) -> Unit): () -> Unit {
     }
 
     return {
-        // 정확한 위치(FINE)를 거절해도 대략적 위치(COARSE)만 있으면 동작
-        val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) ==
-            PackageManager.PERMISSION_GRANTED
-        if (granted) {
+        if (hasLocationPermission(context)) {
             fetch()
         } else {
             permissionLauncher.launch(

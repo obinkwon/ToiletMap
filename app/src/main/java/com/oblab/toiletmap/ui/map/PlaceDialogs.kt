@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.oblab.toiletmap.data.PlaceWithStats
+import com.oblab.toiletmap.data.formatDistance
 
 /** 이름·비밀번호·메모 편집. 빈 칸으로 저장하면 지운다. */
 @Composable
@@ -40,6 +41,31 @@ fun EditInfoDialog(
         },
         confirmButton = { TextButton(onClick = { onSave(name, password, memo) }) { Text("저장") } },
         dismissButton = { TextButton(onClick = onDismiss) { Text("취소") } },
+    )
+}
+
+/** 위젯으로 등록한 장소가 이전 장소와 가까울 때. 바깥을 누르면 "나중에"(다음 실행 때 다시 묻기). */
+@Composable
+fun MergeDialog(
+    candidate: MergeCandidate,
+    remaining: Int,
+    onMerge: () -> Unit,
+    onKeepSeparate: () -> Unit,
+    onLater: () -> Unit,
+) {
+    val target = candidate.target
+    AlertDialog(
+        onDismissRequest = onLater,
+        title = { Text("이전 장소로 합칠까요?") },
+        text = {
+            Text(
+                "위젯으로 등록한 곳이 '${target.name ?: target.address ?: "이름 없음"}'에서 " +
+                    "${formatDistance(candidate.distanceM)} 떨어져 있어요.\n합치면 방문 기록이 이전 장소로 옮겨져요." +
+                    if (remaining > 1) "\n(남은 확인 ${remaining}건)" else "",
+            )
+        },
+        confirmButton = { TextButton(onClick = onMerge) { Text("합치기") } },
+        dismissButton = { TextButton(onClick = onKeepSeparate) { Text("따로 두기") } },
     )
 }
 

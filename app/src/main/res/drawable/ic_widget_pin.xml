@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 1x1 위젯용 흰 핀 + 초록 물방울 (앱 아이콘과 같은 모양, 여백 없이) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="32dp"
+    android:viewportWidth="24"
+    android:viewportHeight="32">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,1C5.9,1 1,5.9 1,12c0,8.5 11,19 11,19s11,-10.5 11,-19C23,5.9 18.1,1 12,1z" />
+    <path
+        android:fillColor="#0E7C66"
+        android:pathData="M12,6c0,0 -4,4.6 -4,7.2a4,4 0,0 0,8 0C16,10.6 12,6 12,6z" />
+</vector>

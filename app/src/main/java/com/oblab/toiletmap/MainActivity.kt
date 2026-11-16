@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kakao.vectormap.KakaoMap
 import com.oblab.toiletmap.ui.list.PlaceListScreen
+import com.oblab.toiletmap.ui.settings.SettingsRoute
 import com.oblab.toiletmap.ui.map.CameraTarget
 import com.oblab.toiletmap.ui.map.DeleteConfirmDialog
 import com.oblab.toiletmap.ui.map.DuplicateDialog
@@ -25,13 +26,17 @@ import com.oblab.toiletmap.ui.map.EditInfoDialog
 import com.oblab.toiletmap.ui.map.MapPin
 import com.oblab.toiletmap.ui.map.MapScreen
 import com.oblab.toiletmap.ui.map.MapViewModel
+import com.oblab.toiletmap.ui.map.MergeDialog
 import com.oblab.toiletmap.ui.map.PlaceSheetActions
 import com.oblab.toiletmap.ui.map.rememberMyLocationRequester
 import com.oblab.toiletmap.ui.map.toDetail
 import com.oblab.toiletmap.ui.map.toListItem
 
+/** 이 장소를 선택한 채로 앱을 연다(위젯 완료 카드의 [앱에서 보기]). */
+const val EXTRA_PLACE_ID = "place_id"
+
 /** 지금 지도 위에 떠 있는 것. 한 번에 하나만. */
-private enum class Overlay { NONE, LIST, EDIT_LOCATION, EDIT_INFO, DELETE }
+private enum class Overlay { NONE, LIST, SETTINGS, EDIT_LOCATION, EDIT_INFO, DELETE }
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,14 +73,23 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                // 앱을 열면 바로 현재 위치로 이동
-                LaunchedEffect(Unit) { requestMyLocation() }
+                // 위젯에서 [앱에서 보기]로 열었으면 그 장소로, 아니면 현재 위치로 이동
+                var pendingPlaceId by rememberSaveable { mutableStateOf(intent.getStringExtra(EXTRA_PLACE_ID)) }
+                LaunchedEffect(Unit) { if (pendingPlaceId == null) requestMyLocation() }
+                LaunchedEffect(places, pendingPlaceId) {
+                    val place = places.find { it.id == pendingPlaceId } ?: return@LaunchedEffect // DB 로딩 전이면 다음 places에서 다시
+                    vm.select(place.id)
+                    moveTo(place.latitude, place.longitude)
+                    pendingPlaceId = null
+                }
 
                 BackHandler(enabled = overlay != Overlay.NONE || selected != null) {
                     if (overlay != Overlay.NONE) overlay = Overlay.NONE else vm.select(null)
                 }
 
-                if (overlay == Overlay.LIST) {
+                if (overlay == Overlay.SETTINGS) {
+                    SettingsRoute(onBack = { overlay = Overlay.NONE })
+                } else if (overlay == Overlay.LIST) {
                     PlaceListScreen(
                         places = places.map { it.toListItem(myLocation) },
                         onBack = { overlay = Overlay.NONE },
@@ -96,6 +110,7 @@ class MainActivity : ComponentActivity() {
                         onMyLocationClick = requestMyLocation,
                         onRegisterClick = requestRegisterLocation,
                         onListClick = { overlay = Overlay.LIST },
+                        onSettingsClick = { overlay = Overlay.SETTINGS },
                         sheetActions = PlaceSheetActions(
                             onEditLocation = {
                                 selected?.let { moveTo(it.latitude, it.longitude) }
@@ -123,6 +138,16 @@ class MainActivity : ComponentActivity() {
                         onAddVisit = vm::addVisitToDuplicate,
                         onNewPlace = { vm.saveNewPlace(candidate.location) },
                         onDismiss = vm::dismissDuplicate,
+                    )
+                }
+
+                vm.mergeQueue.firstOrNull()?.let { candidate ->
+                    MergeDialog(
+                        candidate = candidate,
+                        remaining = vm.mergeQueue.size,
+                        onMerge = vm::mergeCurrent,
+                        onKeepSeparate = vm::keepSeparateCurrent,
+                        onLater = vm::postponeMerges,
                     )
                 }
 

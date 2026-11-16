@@ -92,6 +92,7 @@ fun MapScreen(
     onMyLocationClick: () -> Unit = {},
     onRegisterClick: () -> Unit = {},
     onListClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
     sheetActions: PlaceSheetActions = PlaceSheetActions(),
     onConfirmLocation: () -> Unit = {},
     onCancelEditLocation: () -> Unit = {},
@@ -124,7 +125,7 @@ fun MapScreen(
                 color = Ink,
             )
         } else {
-            TopBar(onListClick, Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(16.dp))
+            TopBar(onListClick, onSettingsClick, Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(16.dp))
         }
 
         Column(
@@ -178,7 +179,7 @@ private fun EditLocationBar(onCancel: () -> Unit, onConfirm: () -> Unit) {
 }
 
 @Composable
-private fun TopBar(onListClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun TopBar(onListClick: () -> Unit, onSettingsClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -199,7 +200,7 @@ private fun TopBar(onListClick: () -> Unit, modifier: Modifier = Modifier) {
             }
         }
         RoundIconButton(Icons.AutoMirrored.Filled.List, "목록 보기", onClick = onListClick)
-        RoundIconButton(Icons.Default.Settings, "설정")
+        RoundIconButton(Icons.Default.Settings, "설정", onClick = onSettingsClick)
     }
 }
 

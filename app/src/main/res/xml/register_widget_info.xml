@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 2x1 위젯. "마지막 등록: N분 전" 글자를 맞추려고 30분마다 다시 그린다(시스템 최소 주기) -->
+<!-- 기본 2x1, 1x1까지 줄일 수 있음. "마지막 · N분 전" 글자를 맞추려고 30분마다 다시 그린다(시스템 최소 주기) -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:minWidth="110dp"
+    android:minWidth="40dp"
     android:minHeight="40dp"
     android:targetCellWidth="2"
     android:targetCellHeight="1"

@@ -21,6 +21,12 @@ class DistanceTest {
     }
 
     @Test
+    fun nearestWithin_skipsExcludedSelf() {
+        val places = listOf(place("self", 37.5, 127.0), place("other", 37.5001, 127.0))
+        assertEquals("other", places.nearestWithin(37.5, 127.0, excludeId = "self")?.first?.id)
+    }
+
+    @Test
     fun nearestWithin_nullWhenNoneInside() {
         assertNull(listOf(place("out", 37.501, 127.0)).nearestWithin(37.5, 127.0))
     }
