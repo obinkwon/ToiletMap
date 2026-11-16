@@ -1,5 +1,6 @@
 package com.oblab.toiletmap.ui.map
 
+import android.location.Location
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -22,6 +23,8 @@ import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.LatLng
 import com.kakao.vectormap.MapLifeCycleCallback
 import com.kakao.vectormap.MapView
+import com.kakao.vectormap.camera.CameraAnimation
+import com.kakao.vectormap.camera.CameraUpdateFactory
 import com.kakao.vectormap.label.LabelOptions
 import com.oblab.toiletmap.R
 
@@ -31,6 +34,7 @@ data class MapPin(val id: String, val latitude: Double, val longitude: Double)
 @Composable
 fun KakaoMapView(
     pins: List<MapPin>,
+    myLocation: Location?,
     onPinClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -76,7 +80,7 @@ fun KakaoMapView(
         onDispose { lifecycle.removeObserver(observer) }
     }
 
-    LaunchedEffect(kakaoMap, pins) {
+    LaunchedEffect(kakaoMap, pins, myLocation) {
         val layer = kakaoMap?.labelManager?.layer ?: return@LaunchedEffect
         val icon = ContextCompat.getDrawable(context, R.drawable.ic_map_pin)!!.toBitmap()
         layer.removeAll()
@@ -85,6 +89,20 @@ fun KakaoMapView(
                 LabelOptions.from(it.id, LatLng.from(it.latitude, it.longitude)).setStyles(icon).setClickable(true),
             )
         }
+        if (myLocation != null) {
+            val dot = ContextCompat.getDrawable(context, R.drawable.ic_my_location)!!.toBitmap()
+            layer.addLabel(LabelOptions.from(LatLng.from(myLocation.latitude, myLocation.longitude)).setStyles(dot))
+        }
+    }
+
+    // 새 위치를 받을 때마다(같은 자리여도) 그 위치로 카메라 이동
+    LaunchedEffect(kakaoMap, myLocation) {
+        val map = kakaoMap ?: return@LaunchedEffect
+        val location = myLocation ?: return@LaunchedEffect
+        map.moveCamera(
+            CameraUpdateFactory.newCenterPosition(LatLng.from(location.latitude, location.longitude), 16),
+            CameraAnimation.from(300),
+        )
     }
 
     AndroidView(factory = { mapView }, modifier = modifier)

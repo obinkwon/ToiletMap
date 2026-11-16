@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 앱 기본 초록. ui/theme/Color.kt의 Green과 같은 값 -->
+    <color name="brand_green">#0E7C66</color>
+</resources>

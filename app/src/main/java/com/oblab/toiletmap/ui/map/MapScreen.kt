@@ -1,5 +1,6 @@
 package com.oblab.toiletmap.ui.map
 
+import android.location.Location
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -81,7 +82,9 @@ data class PlaceDetail(
 fun MapScreen(
     selected: PlaceDetail?,
     pins: List<MapPin> = emptyList(),
+    myLocation: Location? = null,
     onPinClick: (String) -> Unit = {},
+    onMyLocationClick: () -> Unit = {},
     onRegisterClick: () -> Unit = {},
 ) {
     Box(Modifier.fillMaxSize()) {
@@ -89,14 +92,14 @@ fun MapScreen(
         if (LocalInspectionMode.current) {
             MapPlaceholder(hasSelection = selected != null, modifier = Modifier.fillMaxSize())
         } else {
-            KakaoMapView(pins, onPinClick, Modifier.fillMaxSize())
+            KakaoMapView(pins, myLocation, onPinClick, Modifier.fillMaxSize())
         }
         TopBar(Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(16.dp))
         Column(
             Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
             horizontalAlignment = Alignment.End,
         ) {
-            RoundIconButton(Icons.Default.LocationOn, "내 위치로 이동", Modifier.padding(16.dp), tint = MyBlue)
+            RoundIconButton(Icons.Default.LocationOn, "내 위치로 이동", Modifier.padding(16.dp), tint = MyBlue, onClick = onMyLocationClick)
             if (selected == null) RegisterButton(onRegisterClick) else PlaceSheet(selected)
         }
     }

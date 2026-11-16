@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 스플래시 아이콘: 흰 지도 핀 + 물방울. 240dp 중 가운데 160dp 원 안에만 그린다(시스템이 원 밖을 자름) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="240dp"
+    android:viewportWidth="240"
+    android:viewportHeight="240">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M120,170C108,156 82,130 82,108A38,38 0,1 1,158 108C158,130 132,156 120,170Z" />
+    <path
+        android:fillColor="#0E7C66"
+        android:pathData="M120,88C120,88 106,104 106,113A14,14 0,0 0,134 113C134,104 120,88 120,88Z" />
+</vector>
