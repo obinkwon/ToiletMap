@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 지도 핀. 시안과 같은 모양·색 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="28dp"
+    android:height="36dp"
+    android:viewportWidth="24"
+    android:viewportHeight="32">
+    <path
+        android:fillColor="#0E7C66"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:pathData="M12,1C5.9,1 1,5.9 1,12c0,8.5 11,19 11,19s11,-10.5 11,-19C23,5.9 18.1,1 12,1z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,12m-4.5,0a4.5,4.5 0,1 1,9 0a4.5,4.5 0,1 1,-9 0" />
+</vector>
