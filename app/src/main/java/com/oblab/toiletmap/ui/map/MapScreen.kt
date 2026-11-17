@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -202,7 +201,7 @@ private fun TopBar(onListClick: () -> Unit, onSettingsClick: () -> Unit, modifie
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // 검색은 목록 화면에서 한다. 여기선 누르면 목록 화면으로 이동
+        // 검색은 목록 화면에서 한다. 여기선 누르면 목록 화면으로 이동(따로 있던 목록 버튼은 같은 동작이라 뺐다)
         Surface(
             onClick = onListClick,
             modifier = Modifier.weight(1f).height(48.dp),
@@ -216,7 +215,6 @@ private fun TopBar(onListClick: () -> Unit, onSettingsClick: () -> Unit, modifie
                 Text("이름·주소 검색", color = SubText, fontSize = 15.sp)
             }
         }
-        RoundIconButton(Icons.AutoMirrored.Filled.List, "목록 보기", onClick = onListClick)
         RoundIconButton(Icons.Default.Settings, "설정", onClick = onSettingsClick)
     }
 }
