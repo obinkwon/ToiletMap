@@ -1,9 +1,13 @@
 package com.oblab.toiletmap.ui.map
 
 import android.location.Location
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,10 +46,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.unit.IntOffset
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -103,7 +112,10 @@ fun MapScreen(
         if (LocalInspectionMode.current) {
             MapPlaceholder(hasSelection = selected != null, modifier = Modifier.fillMaxSize())
         } else {
-            KakaoMapView(pins, myLocation, cameraTarget, onPinClick, Modifier.fillMaxSize(), onMapReady)
+            KakaoMapView(pins, myLocation, cameraTarget, onPinClick, Modifier.fillMaxSize(), onMapReady) {
+                // 위치 수정 중엔 선택을 유지해야 저장할 수 있다
+                if (selected != null && !editingLocation) sheetActions.onDismiss()
+            }
         }
 
         if (editingLocation) {
@@ -148,6 +160,8 @@ class PlaceSheetActions(
     val onAddVisit: () -> Unit = {},
     val onEditInfo: () -> Unit = {},
     val onDelete: () -> Unit = {},
+    /** 시트를 아래로 쓸어내리거나 지도 빈 곳을 눌렀을 때. */
+    val onDismiss: () -> Unit = {},
 )
 
 @Composable
@@ -239,8 +253,21 @@ private fun RegisterButton(onClick: () -> Unit) {
 private fun PlaceSheet(place: PlaceDetail, actions: PlaceSheetActions) {
     var showPassword by remember(place) { mutableStateOf(false) }
     var menuOpen by remember { mutableStateOf(false) }
+    val dragY = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
+    val dismissPx = with(LocalDensity.current) { 100.dp.toPx() }
     Surface(
-        Modifier.fillMaxWidth(),
+        Modifier
+            .fillMaxWidth()
+            .offset { IntOffset(0, dragY.value.roundToInt()) }
+            .draggable(
+                rememberDraggableState { delta -> scope.launch { dragY.snapTo((dragY.value + delta).coerceAtLeast(0f)) } },
+                Orientation.Vertical,
+                // 100dp 넘게 내리거나 빠르게 휙 내리면 닫고, 아니면 제자리로
+                onDragStopped = { velocity ->
+                    if (dragY.value > dismissPx || velocity > 1500f) actions.onDismiss() else dragY.animateTo(0f)
+                },
+            ),
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
         color = Color.White,
         shadowElevation = 8.dp,

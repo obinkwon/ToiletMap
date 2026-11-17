@@ -42,11 +42,13 @@ fun KakaoMapView(
     onPinClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     onMapReady: (KakaoMap) -> Unit = {},
+    onMapClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val currentOnPinClick by rememberUpdatedState(onPinClick)
     val currentOnMapReady by rememberUpdatedState(onMapReady)
+    val currentOnMapClick by rememberUpdatedState(onMapClick)
     var kakaoMap by remember { mutableStateOf<KakaoMap?>(null) }
 
     val mapView = remember {
@@ -66,6 +68,7 @@ fun KakaoMapView(
                             currentOnPinClick(label.labelId)
                             true // 클릭 처리함: 지도 클릭으로 넘기지 않음
                         }
+                        map.setOnMapClickListener { _, _, _, _ -> currentOnMapClick() }
                         kakaoMap = map
                         currentOnMapReady(map)
                     }
