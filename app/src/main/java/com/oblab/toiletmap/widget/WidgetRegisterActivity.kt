@@ -26,7 +26,6 @@ import com.oblab.toiletmap.ui.map.hasLocationPermission
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-// ponytail: 위치를 못 찾을 때 기다리는 시간. 기획서 미정 항목이라 15초로 시작, 실기기 PoC 결과 보고 조정
 private const val LOCATION_TIMEOUT_MS = 15_000L
 
 /**

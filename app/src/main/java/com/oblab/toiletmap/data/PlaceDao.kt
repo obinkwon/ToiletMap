@@ -34,6 +34,9 @@ abstract class PlaceDao {
     @Query("UPDATE place SET address = :address, updated_at = :now WHERE id = :id")
     abstract suspend fun updateAddress(id: String, address: String, now: Long)
 
+    @Query("SELECT * FROM place WHERE deleted = 'N' AND address IS NULL")
+    abstract suspend fun placesWithoutAddress(): List<PlaceEntity>
+
     @Query("UPDATE place SET name = :name, password = :password, memo = :memo, updated_at = :now WHERE id = :id")
     abstract suspend fun updateInfo(id: String, name: String?, password: String?, memo: String?, now: Long)
 

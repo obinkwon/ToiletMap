@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import com.oblab.toiletmap.data.formatDistance
 
 /** 앱 등록 때 30m 안에 이전 장소가 있으면 묻는다. 바깥을 누르면 등록 취소. */
-// ponytail: 가장 가까운 장소 하나만 보여준다. 여러 곳 중 고르게 하려면 목록으로 확장
 @Composable
 fun DuplicateDialog(
     candidate: DuplicateCandidate,

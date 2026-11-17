@@ -96,13 +96,22 @@ class PlaceRepository(
         appScope.launch { RegisterWidget().updateAll(context) }
     }
 
-    // ponytail: 오프라인이면 주소 없이 끝난다. 연결되면 채우는 WorkManager 작업은 아직 없음
+    /** 주소 없는 장소를 모두 다시 찾아본다(AddressWorker용). 전부 채웠으면 true. */
+    suspend fun fillMissingAddresses(): Boolean =
+        dao.placesWithoutAddress().map { lookupAddress(it.id, it.latitude, it.longitude) }.all { it }
+
+    /** 지금 바로 찾아보고, 못 찾으면(주로 오프라인) 네트워크가 생길 때 다시 하도록 예약한다. */
+    private suspend fun fillAddress(placeId: String, lat: Double, lng: Double) {
+        if (!lookupAddress(placeId, lat, lng)) AddressWorker.enqueue(context)
+    }
+
     @Suppress("DEPRECATION") // 비동기 getFromLocation은 API 33+ 전용이라 minSdk 28에선 동기 버전을 IO 스레드에서 쓴다
-    private suspend fun fillAddress(placeId: String, lat: Double, lng: Double) = withContext(Dispatchers.IO) {
+    private suspend fun lookupAddress(placeId: String, lat: Double, lng: Double): Boolean = withContext(Dispatchers.IO) {
         val line = runCatching {
             Geocoder(context, Locale.KOREA).getFromLocation(lat, lng, 1)?.firstOrNull()?.getAddressLine(0)
-        }.getOrNull() ?: return@withContext
+        }.getOrNull() ?: return@withContext false
         dao.updateAddress(placeId, line.removePrefix("대한민국 "), System.currentTimeMillis())
+        true
     }
 
     private fun Location.toVisit(placeId: String, now: Long) = VisitEntity(

@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.work.runtime.ktx)
     testImplementation(libs.junit)
     // 안드로이드 org.json은 로컬 단위 테스트에서 빈 껍데기라 실제 구현을 테스트에만 넣는다
     testImplementation(libs.org.json)

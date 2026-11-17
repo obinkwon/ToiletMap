@@ -17,7 +17,6 @@ class ToiletMapApp : Application() {
 
     val settings by lazy { AppSettings(this) }
 
-    // ponytail: Hilt 대신 수동 주입. 의존성이 늘어나면 Hilt로 교체
     val repository by lazy {
         val db = Room.databaseBuilder(this, AppDatabase::class.java, "toiletmap.db").build()
         PlaceRepository(db.placeDao(), this, appScope)
