@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -97,6 +98,7 @@ fun MapScreen(
     selected: PlaceDetail?,
     pins: List<MapPin> = emptyList(),
     myLocation: Location? = null,
+    locating: Boolean = false,
     cameraTarget: CameraTarget? = null,
     editingLocation: Boolean = false,
     onPinClick: (String) -> Unit = {},
@@ -140,6 +142,11 @@ fun MapScreen(
             )
         } else {
             TopBar(onListClick, onSettingsClick, Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(16.dp))
+        }
+
+        if (locating) {
+            // 상단 바(48dp + 위아래 16dp) 바로 아래
+            LocatingBadge(Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(top = 84.dp))
         }
 
         Column(
@@ -359,6 +366,17 @@ private fun PlaceSheet(place: PlaceDetail, actions: PlaceSheetActions) {
                     Text("방문 추가", fontWeight = FontWeight.Bold)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun LocatingBadge(modifier: Modifier = Modifier) {
+    Surface(modifier, shape = CircleShape, color = Color.White, shadowElevation = 4.dp) {
+        Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            CircularProgressIndicator(Modifier.size(18.dp), color = Green, strokeWidth = 2.dp)
+            Spacer(Modifier.width(10.dp))
+            Text("현재 위치를 찾는 중…", fontSize = 14.sp, color = Ink)
         }
     }
 }

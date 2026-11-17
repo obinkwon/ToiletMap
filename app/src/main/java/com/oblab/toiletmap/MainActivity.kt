@@ -53,23 +53,25 @@ class MainActivity : ComponentActivity() {
                 var myLocation by remember { mutableStateOf<Location?>(null) }
                 var cameraTarget by remember { mutableStateOf<CameraTarget?>(null) }
                 var kakaoMap by remember { mutableStateOf<KakaoMap?>(null) }
+                var locating by remember { mutableStateOf(false) }
+                val onBusy = { busy: Boolean -> locating = busy }
                 var overlay by rememberSaveable { mutableStateOf(Overlay.NONE) }
 
                 fun moveTo(lat: Double, lng: Double) {
                     cameraTarget = CameraTarget(lat, lng)
                 }
 
-                val requestMyLocation = rememberMyLocationRequester {
+                val requestMyLocation = rememberMyLocationRequester(onBusy) {
                     myLocation = it
                     moveTo(it.latitude, it.longitude)
                 }
-                val requestRegisterLocation = rememberMyLocationRequester {
+                val requestRegisterLocation = rememberMyLocationRequester(onBusy) {
                     myLocation = it
                     moveTo(it.latitude, it.longitude)
                     vm.onRegisterLocation(it)
                 }
                 val selected = places.find { it.id == vm.selectedId }
-                val requestVisitLocation = rememberMyLocationRequester { location ->
+                val requestVisitLocation = rememberMyLocationRequester(onBusy) { location ->
                     myLocation = location
                     selected?.let {
                         vm.addVisit(it.id, location)
@@ -98,6 +100,7 @@ class MainActivity : ComponentActivity() {
                         selected = selected?.toDetail(myLocation),
                         pins = places.map { MapPin(it.id, it.latitude, it.longitude) },
                         myLocation = myLocation,
+                        locating = locating,
                         cameraTarget = cameraTarget,
                         editingLocation = overlay == Overlay.EDIT_LOCATION && selected != null,
                         onPinClick = vm::select,

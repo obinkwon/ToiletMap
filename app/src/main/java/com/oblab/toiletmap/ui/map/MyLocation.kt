@@ -24,16 +24,20 @@ fun hasLocationPermission(context: Context) =
 /**
  * 현재 위치를 한 번 받아오는 함수를 돌려준다.
  * 권한이 없으면 먼저 위치 권한을 묻고, 허용되면 이어서 위치를 받는다.
+ * [onBusy]: 위치를 찾기 시작하면 true, 끝나면(성공·실패 모두) false. 로딩 표시용.
  */
 @Composable
-fun rememberMyLocationRequester(onLocation: (Location) -> Unit): () -> Unit {
+fun rememberMyLocationRequester(onBusy: (Boolean) -> Unit = {}, onLocation: (Location) -> Unit): () -> Unit {
     val context = LocalContext.current
     val currentOnLocation by rememberUpdatedState(onLocation)
+    val currentOnBusy by rememberUpdatedState(onBusy)
     val client = remember { LocationServices.getFusedLocationProviderClient(context) }
 
     @SuppressLint("MissingPermission") // 호출 전에 권한 확인함
     fun fetch() {
+        currentOnBusy(true)
         client.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+            .addOnCompleteListener { currentOnBusy(false) }
             .addOnSuccessListener { location ->
                 if (location != null) currentOnLocation(location)
                 else Toast.makeText(context, "현재 위치를 찾지 못했어요", Toast.LENGTH_SHORT).show()
