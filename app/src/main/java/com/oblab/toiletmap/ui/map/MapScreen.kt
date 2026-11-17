@@ -5,6 +5,8 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -171,6 +173,8 @@ class PlaceSheetActions(
     val onDelete: () -> Unit = {},
     /** 시트를 아래로 쓸어내리거나 지도 빈 곳을 눌렀을 때. */
     val onDismiss: () -> Unit = {},
+    /** 시트 빈 곳을 눌렀을 때: 지도를 이 장소로 옮긴다. */
+    val onFocus: () -> Unit = {},
 )
 
 @Composable
@@ -281,7 +285,16 @@ private fun PlaceSheet(place: PlaceDetail, actions: PlaceSheetActions) {
         shadowElevation = 8.dp,
     ) {
         Column(
-            Modifier.navigationBarsPadding().padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 24.dp),
+            Modifier
+                // 버튼이 아닌 곳을 누르면 지도를 이 장소로 옮긴다. 시트 전체가 번쩍이지 않게 눌림 효과는 끈다
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClickLabel = "지도에서 이 장소 보기",
+                    onClick = actions.onFocus,
+                )
+                .navigationBarsPadding()
+                .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Box(Modifier.align(Alignment.CenterHorizontally).size(36.dp, 4.dp).background(Line, RoundedCornerShape(2.dp)))

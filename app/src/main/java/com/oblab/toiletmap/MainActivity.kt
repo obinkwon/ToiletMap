@@ -117,6 +117,7 @@ class MainActivity : ComponentActivity() {
                             onEditInfo = { overlay = Overlay.EDIT_INFO },
                             onDelete = { overlay = Overlay.DELETE },
                             onDismiss = { vm.select(null) },
+                            onFocus = { selected?.let { moveTo(it.latitude, it.longitude) } },
                         ),
                         onConfirmLocation = {
                             val center = kakaoMap?.cameraPosition?.position
