@@ -81,7 +81,7 @@ private fun textFor(step: RegisterStep) = when (step) {
  * [onDismiss]: 바깥 누름·취소·닫기, [onPrimary]: 허용하기·등록·앱에서 보기
  */
 @Composable
-fun RegisterSheet(step: RegisterStep, onDismiss: () -> Unit, onPrimary: () -> Unit) {
+fun RegisterSheet(step: RegisterStep, onDismiss: () -> Unit, onPrimary: () -> Unit, secondsLeft: Int = 3) {
     val text = textFor(step)
     Box(Modifier.fillMaxSize()) {
         // 바깥을 누르면 닫힘. 위치 찾는 중엔 실수로 닫히지 않게 막는다(취소는 버튼으로)
@@ -141,7 +141,7 @@ fun RegisterSheet(step: RegisterStep, onDismiss: () -> Unit, onPrimary: () -> Un
                     }
                 }
                 if (step == RegisterStep.DONE) {
-                    Text("3초 뒤 자동으로 닫혀요", fontSize = 12.sp, color = SubText)
+                    Text("${secondsLeft}초 뒤 자동으로 닫혀요", fontSize = 12.sp, color = SubText)
                 }
             }
         }

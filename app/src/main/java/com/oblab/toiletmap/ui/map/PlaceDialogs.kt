@@ -36,7 +36,7 @@ import com.oblab.toiletmap.ui.theme.Ink
 import com.oblab.toiletmap.ui.theme.Line
 import com.oblab.toiletmap.ui.theme.SubText
 
-private val DangerRed = Color(0xFFB3261E)
+internal val DangerRed = Color(0xFFB3261E)
 
 /** 이름·비밀번호·메모 편집. 빈 칸으로 저장하면 지운다. */
 @Composable

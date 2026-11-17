@@ -11,6 +11,7 @@ import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +28,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
@@ -291,21 +294,23 @@ private fun PlaceSheet(place: PlaceDetail, actions: PlaceSheetActions) {
                     IconButton(onClick = { menuOpen = true }) {
                         Icon(Icons.Default.MoreVert, "더보기 (정보 편집, 삭제)", tint = SubText)
                     }
-                    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                        DropdownMenuItem(
-                            text = { Text("이름·비밀번호·메모 편집") },
-                            onClick = {
-                                menuOpen = false
-                                actions.onEditInfo()
-                            },
-                        )
-                        DropdownMenuItem(
-                            text = { Text("삭제", color = Color(0xFFB3261E)) },
-                            onClick = {
-                                menuOpen = false
-                                actions.onDelete()
-                            },
-                        )
+                    // 팝업들과 같은 흰 카드 + 둥근 모서리. 삭제는 구분선 아래 빨간색
+                    DropdownMenu(
+                        expanded = menuOpen,
+                        onDismissRequest = { menuOpen = false },
+                        shape = RoundedCornerShape(16.dp),
+                        containerColor = Color.White,
+                        shadowElevation = 8.dp,
+                    ) {
+                        SheetMenuItem(Icons.Default.Edit, "정보 편집", Ink) {
+                            menuOpen = false
+                            actions.onEditInfo()
+                        }
+                        HorizontalDivider(Modifier.padding(horizontal = 12.dp), color = DividerColor)
+                        SheetMenuItem(Icons.Default.Delete, "삭제", DangerRed) {
+                            menuOpen = false
+                            actions.onDelete()
+                        }
                     }
                 }
             }
@@ -358,6 +363,17 @@ private fun PlaceSheet(place: PlaceDetail, actions: PlaceSheetActions) {
             }
         }
     }
+}
+
+@Composable
+private fun SheetMenuItem(icon: ImageVector, label: String, color: Color, onClick: () -> Unit) {
+    DropdownMenuItem(
+        text = { Text(label, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = color) },
+        onClick = onClick,
+        leadingIcon = { Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp)) },
+        modifier = Modifier.width(180.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+    )
 }
 
 @Composable
