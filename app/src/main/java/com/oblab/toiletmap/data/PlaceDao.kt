@@ -21,10 +21,6 @@ abstract class PlaceDao {
     )
     abstract fun observePlaces(): Flow<List<PlaceWithStats>>
 
-    /** 위젯의 "마지막 등록" 시각. 삭제한 장소의 방문은 빼고 본다. */
-    @Query("SELECT MAX(v.visited_at) FROM visit v JOIN place p ON p.id = v.place_id WHERE p.deleted = 'N'")
-    abstract suspend fun lastVisitedAt(): Long?
-
     @Insert
     abstract suspend fun insertPlace(place: PlaceEntity)
 

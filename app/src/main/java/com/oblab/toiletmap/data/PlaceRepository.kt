@@ -3,8 +3,6 @@ package com.oblab.toiletmap.data
 import android.content.Context
 import android.location.Geocoder
 import android.location.Location
-import androidx.glance.appwidget.updateAll
-import com.oblab.toiletmap.widget.RegisterWidget
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -12,7 +10,7 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 
 /**
- * [appScope]: 화면이 닫혀도 끝까지 돌아야 하는 후속 작업용(주소 채우기, 위젯 갱신).
+ * [appScope]: 화면이 닫혀도 끝까지 돌아야 하는 후속 작업용(주소 채우기).
  * 위젯 등록 화면은 저장 직후 바로 닫히기 때문.
  */
 class PlaceRepository(
@@ -22,8 +20,6 @@ class PlaceRepository(
 ) {
 
     val places = dao.observePlaces()
-
-    suspend fun lastVisitedAt(): Long? = dao.lastVisitedAt()
 
     /**
      * 새 장소로 등록하고 id를 돌려준다. 주소는 저장 후 따로 채운다.
@@ -40,14 +36,12 @@ class PlaceRepository(
         )
         dao.insertPlaceWithVisit(place, location.toVisit(place.id, now))
         appScope.launch { fillAddress(place.id, location.latitude, location.longitude) }
-        refreshWidget()
         return place.id
     }
 
     /** 이전 장소에 방문만 추가. */
     suspend fun addVisit(placeId: String, location: Location) {
         dao.insertVisit(location.toVisit(placeId, System.currentTimeMillis()))
-        refreshWidget()
     }
 
     /** 이름·비밀번호·메모 저장. 빈 칸은 null로 저장한다. */
@@ -69,7 +63,6 @@ class PlaceRepository(
 
     suspend fun delete(placeId: String) {
         dao.softDelete(placeId, System.currentTimeMillis())
-        refreshWidget()
     }
 
     suspend fun uncheckedIds(): List<String> = dao.uncheckedIds()
@@ -87,13 +80,7 @@ class PlaceRepository(
     suspend fun importBackup(json: String): Int {
         val data = parseBackup(json)
         dao.importBackup(data.places, data.visits)
-        refreshWidget()
         return data.places.size
-    }
-
-    /** 홈 화면 위젯의 "마지막 등록" 시각을 다시 그린다. */
-    private fun refreshWidget() {
-        appScope.launch { RegisterWidget().updateAll(context) }
     }
 
     /** 주소 없는 장소를 모두 다시 찾아본다(AddressWorker용). 전부 채웠으면 true. */
