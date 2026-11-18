@@ -7,6 +7,10 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+val localProps = Properties().apply {
+    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+}
+
 android {
     namespace = "com.oblab.toiletmap"
     compileSdk = 36
@@ -22,14 +26,26 @@ android {
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
 
         // 카카오 네이티브 앱 키는 git에 안 올리려고 local.properties(KAKAO_NATIVE_APP_KEY)에서 읽는다
-        val localProps = Properties().apply {
-            rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
-        }
         buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"${localProps.getProperty("KAKAO_NATIVE_APP_KEY", "")}\"")
+    }
+
+    // 업로드 키 정보는 git에 안 올리려고 local.properties(RELEASE_STORE_FILE 등)에서 읽는다
+    val releaseStoreFile = localProps.getProperty("RELEASE_STORE_FILE")
+    signingConfigs {
+        if (releaseStoreFile != null) {
+            create("release") {
+                storeFile = rootProject.file(releaseStoreFile)
+                storePassword = localProps.getProperty("RELEASE_STORE_PASSWORD")
+                keyAlias = localProps.getProperty("RELEASE_KEY_ALIAS")
+                keyPassword = localProps.getProperty("RELEASE_KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
         release {
+            // 키 설정이 없으면 서명 없이 빌드된다(debug 빌드는 영향 없음)
+            signingConfigs.findByName("release")?.let { signingConfig = it }
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
