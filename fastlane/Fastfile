@@ -2,6 +2,13 @@ default_platform(:android)
 
 platform :android do
 
+  desc "Release AAB 빌드만 (업로드 없음)"
+  lane :build do
+    ENV["JAVA_HOME"] = "E:/java/jdk-17.0.19"
+    ENV["PATH"] = "#{ENV['JAVA_HOME']}/bin;#{ENV['PATH']}"
+    gradle(task: "bundle", build_type: "Release")
+  end
+
   desc "beta 배포 (비공개 테스트)"
   lane :beta do
 
