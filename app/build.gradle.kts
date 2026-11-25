@@ -19,7 +19,7 @@ android {
         applicationId = "com.oblab.toiletmap"
         minSdk = 28
         targetSdk = 36
-        versionCode = 2
+        versionCode = 4
         versionName = "0.1.0"
 
         // 카카오맵 네이티브 라이브러리는 ARM용만 있다. x86 라이브러리가 섞이면 x86_64 에뮬레이터가 x86을 골라 크래시
@@ -82,6 +82,8 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.work.runtime.ktx)
+    // play-services-basement가 끌어오는 구버전 fragment(1.1.0) 덮어쓰기 (Play Console 경고)
+    implementation(libs.androidx.fragment)
     testImplementation(libs.junit)
     // 안드로이드 org.json은 로컬 단위 테스트에서 빈 껍데기라 실제 구현을 테스트에만 넣는다
     testImplementation(libs.org.json)
