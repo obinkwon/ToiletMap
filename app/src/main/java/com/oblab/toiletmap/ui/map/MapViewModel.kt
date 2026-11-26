@@ -39,6 +39,9 @@ class MapViewModel(
     var selectedId by mutableStateOf<String?>(null)
         private set
 
+    /** 지도에 원으로 보여줄 중복 감지 반경(m). */
+    val duplicateRadiusM: Int get() = settings.duplicateRadiusM
+
     /** null이 아니면 "이전 장소에 방문 추가 / 새 장소로 등록"을 묻는 중. */
     var duplicate by mutableStateOf<DuplicateCandidate?>(null)
         private set

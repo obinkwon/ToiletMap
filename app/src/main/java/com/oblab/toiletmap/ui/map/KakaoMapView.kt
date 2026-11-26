@@ -33,6 +33,9 @@ import com.kakao.vectormap.camera.CameraAnimation
 import com.kakao.vectormap.camera.CameraUpdateFactory
 import com.kakao.vectormap.label.LabelOptions
 import com.kakao.vectormap.label.LabelStyle
+import com.kakao.vectormap.shape.DotPoints
+import com.kakao.vectormap.shape.PolygonOptions
+import com.kakao.vectormap.shape.PolygonStyles
 import com.oblab.toiletmap.R
 import com.oblab.toiletmap.ui.theme.Green
 import androidx.compose.ui.graphics.toArgb
@@ -47,6 +50,7 @@ class CameraTarget(val latitude: Double, val longitude: Double)
 fun KakaoMapView(
     pins: List<MapPin>,
     myLocation: Location?,
+    duplicateRadiusM: Int,
     cameraTarget: CameraTarget?,
     onPinClick: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -147,6 +151,20 @@ fun KakaoMapView(
             val dot = ContextCompat.getDrawable(context, R.drawable.ic_my_location)!!.toBitmap()
             layer.addLabel(LabelOptions.from(LatLng.from(myLocation.latitude, myLocation.longitude)).setStyles(dot))
         }
+    }
+
+    // 현재 위치 둘레에 중복 감지 반경을 원으로 표시
+    LaunchedEffect(kakaoMap, myLocation, duplicateRadiusM) {
+        val layer = kakaoMap?.shapeManager?.layer ?: return@LaunchedEffect
+        layer.removeAll()
+        if (myLocation == null || duplicateRadiusM <= 0) return@LaunchedEffect
+        val center = LatLng.from(myLocation.latitude, myLocation.longitude)
+        layer.addPolygon(
+            PolygonOptions.from(
+                DotPoints.fromCircle(center, duplicateRadiusM.toFloat()), // 반지름 단위: m
+                PolygonStyles.from(Green.copy(alpha = 0.12f).toArgb(), 2f, Green.copy(alpha = 0.6f).toArgb()),
+            ),
+        )
     }
 
     // 새 목표가 올 때마다(같은 자리여도) 이동. 지도가 다시 만들어지면 마지막 목표로 다시 이동

@@ -100,6 +100,8 @@ class MainActivity : ComponentActivity() {
                         selected = selected?.toDetail(myLocation),
                         pins = places.map { MapPin(it.id, it.latitude, it.longitude) },
                         myLocation = myLocation,
+                        // 설정 화면을 닫으면(overlay 변경) 바뀐 반경을 다시 읽는다
+                        duplicateRadiusM = remember(overlay) { vm.duplicateRadiusM },
                         locating = locating,
                         cameraTarget = cameraTarget,
                         editingLocation = overlay == Overlay.EDIT_LOCATION && selected != null,

@@ -100,6 +100,7 @@ fun MapScreen(
     selected: PlaceDetail?,
     pins: List<MapPin> = emptyList(),
     myLocation: Location? = null,
+    duplicateRadiusM: Int = 0,
     locating: Boolean = false,
     cameraTarget: CameraTarget? = null,
     editingLocation: Boolean = false,
@@ -118,7 +119,7 @@ fun MapScreen(
         if (LocalInspectionMode.current) {
             MapPlaceholder(hasSelection = selected != null, modifier = Modifier.fillMaxSize())
         } else {
-            KakaoMapView(pins, myLocation, cameraTarget, onPinClick, Modifier.fillMaxSize(), onMapReady) {
+            KakaoMapView(pins, myLocation, duplicateRadiusM, cameraTarget, onPinClick, Modifier.fillMaxSize(), onMapReady) {
                 // 위치 수정 중엔 선택을 유지해야 저장할 수 있다
                 if (selected != null && !editingLocation) sheetActions.onDismiss()
             }

@@ -21,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,7 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -51,6 +49,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.oblab.toiletmap.ToiletMapApp
 import com.oblab.toiletmap.data.AppSettings
+import com.oblab.toiletmap.ui.map.AppDialog
+import com.oblab.toiletmap.ui.map.BodyText
 import com.oblab.toiletmap.ui.map.hasLocationPermission
 import com.oblab.toiletmap.ui.theme.DividerColor
 import com.oblab.toiletmap.ui.theme.Fill
@@ -134,18 +134,19 @@ fun SettingsRoute(onBack: () -> Unit) {
     )
 
     if (confirmImport) {
-        AlertDialog(
+        AppDialog(
+            title = "백업을 가져올까요?",
             onDismissRequest = { confirmImport = false },
-            title = { Text("백업을 가져올까요?") },
-            text = { Text("백업에 있는 장소는 지금 앱에 추가되고, 같은 장소는 백업 내용으로 바뀌어요. 걱정되면 먼저 내보내기를 해 두세요.") },
-            confirmButton = {
-                TextButton(onClick = {
-                    confirmImport = false
-                    importLauncher.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
-                }) { Text("파일 고르기") }
+            dismissText = "취소",
+            onDismissClick = { confirmImport = false },
+            confirmText = "파일 고르기",
+            onConfirm = {
+                confirmImport = false
+                importLauncher.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
             },
-            dismissButton = { TextButton(onClick = { confirmImport = false }) { Text("취소") } },
-        )
+        ) {
+            BodyText("백업에 있는 장소는 지금 앱에 추가되고, 같은 장소는 백업 내용으로 바뀌어요. 걱정되면 먼저 내보내기를 해 두세요.")
+        }
     }
 }
 
