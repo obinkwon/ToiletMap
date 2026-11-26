@@ -55,22 +55,22 @@ fun toBackupJson(places: List<PlaceEntity>, visits: List<VisitEntity>, exportedA
  */
 fun parseBackup(text: String): BackupData {
     val root = JSONObject(text)
-    require(root.optString("app") == "toiletmap") { "화장실 지도 백업 파일이 아니에요" }
-    require(root.optInt("version", -1) in 1..BACKUP_VERSION) { "지원하지 않는 백업 버전이에요. 앱을 업데이트해 주세요" }
+    require(root.optString("app") == "toiletmap") { "화장실 지도 백업 파일이 아닙니다" }
+    require(root.optInt("version", -1) in 1..BACKUP_VERSION) { "지원하지 않는 백업 버전입니다. 앱을 업데이트해 주십시오" }
 
     val places = root.getJSONArray("places").objects().map {
         PlaceEntity(
             id = it.getString("id"),
             name = it.stringOrNull("name"),
-            latitude = it.getDouble("latitude").also { v -> require(v in -90.0..90.0) { "위도 값이 잘못됐어요" } },
-            longitude = it.getDouble("longitude").also { v -> require(v in -180.0..180.0) { "경도 값이 잘못됐어요" } },
+            latitude = it.getDouble("latitude").also { v -> require(v in -90.0..90.0) { "위도 값이 잘못되었습니다" } },
+            longitude = it.getDouble("longitude").also { v -> require(v in -180.0..180.0) { "경도 값이 잘못되었습니다" } },
             address = it.stringOrNull("address"),
             password = it.stringOrNull("password"),
             memo = it.stringOrNull("memo"),
             createdAt = it.getLong("created_at"),
             updatedAt = it.getLong("updated_at"),
-            deleted = it.getString("deleted").also { v -> require(v == "Y" || v == "N") { "deleted 값이 잘못됐어요" } },
-            dupChecked = it.getString("dup_checked").also { v -> require(v == "Y" || v == "N") { "dup_checked 값이 잘못됐어요" } },
+            deleted = it.getString("deleted").also { v -> require(v == "Y" || v == "N") { "deleted 값이 잘못되었습니다" } },
+            dupChecked = it.getString("dup_checked").also { v -> require(v == "Y" || v == "N") { "dup_checked 값이 잘못되었습니다" } },
         )
     }
     val visits = root.getJSONArray("visits").objects().map {

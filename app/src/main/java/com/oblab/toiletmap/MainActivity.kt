@@ -75,7 +75,7 @@ class MainActivity : ComponentActivity() {
                     myLocation = location
                     selected?.let {
                         vm.addVisit(it.id, location)
-                        Toast.makeText(context, "방문을 추가했어요", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "방문을 추가했습니다", Toast.LENGTH_SHORT).show()
                     }
                 }
 

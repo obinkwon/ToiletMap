@@ -40,10 +40,10 @@ fun rememberMyLocationRequester(onBusy: (Boolean) -> Unit = {}, onLocation: (Loc
             .addOnCompleteListener { currentOnBusy(false) }
             .addOnSuccessListener { location ->
                 if (location != null) currentOnLocation(location)
-                else Toast.makeText(context, "현재 위치를 찾지 못했어요", Toast.LENGTH_SHORT).show()
+                else Toast.makeText(context, "현재 위치를 찾지 못했습니다", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener {
-                Toast.makeText(context, "현재 위치를 찾지 못했어요", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "현재 위치를 찾지 못했습니다", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -51,7 +51,7 @@ fun rememberMyLocationRequester(onBusy: (Boolean) -> Unit = {}, onLocation: (Loc
         ActivityResultContracts.RequestMultiplePermissions(),
     ) { result ->
         if (result.values.any { it }) fetch()
-        else Toast.makeText(context, "위치 권한을 허용해 주세요", Toast.LENGTH_SHORT).show()
+        else Toast.makeText(context, "위치 권한을 허용해 주십시오", Toast.LENGTH_SHORT).show()
     }
 
     return {

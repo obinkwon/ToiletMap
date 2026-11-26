@@ -47,7 +47,7 @@ class WidgetRegisterActivity : ComponentActivity() {
                     ActivityResultContracts.RequestMultiplePermissions(),
                 ) { result ->
                     if (result.values.any { it }) step = RegisterStep.CONFIRM
-                    else close("위치 권한이 없어 등록할 수 없어요")
+                    else close("위치 권한이 없어 등록할 수 없습니다")
                 }
 
                 RegisterSheet(
@@ -85,7 +85,7 @@ class WidgetRegisterActivity : ComponentActivity() {
         LocationServices.getFusedLocationProviderClient(this).getCurrentLocation(request, null)
             .addOnSuccessListener { location ->
                 if (location == null) {
-                    close("현재 위치를 찾지 못했어요")
+                    close("현재 위치를 찾지 못했습니다")
                 } else {
                     // [취소]로 화면이 이미 닫혔으면 lifecycleScope가 취소돼서 저장하지 않는다
                     lifecycleScope.launch {
@@ -93,7 +93,7 @@ class WidgetRegisterActivity : ComponentActivity() {
                     }
                 }
             }
-            .addOnFailureListener { close("현재 위치를 찾지 못했어요") }
+            .addOnFailureListener { close("현재 위치를 찾지 못했습니다") }
     }
 
     /**

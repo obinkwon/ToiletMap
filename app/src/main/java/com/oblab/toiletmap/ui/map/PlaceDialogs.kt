@@ -88,7 +88,7 @@ fun MergeDialog(
 ) {
     val target = candidate.target
     AppDialog(
-        title = "이전 장소로 합칠까요?",
+        title = "이전 장소로 합치시겠습니까?",
         subtitle = if (remaining > 1) "남은 확인 ${remaining}건" else null,
         onDismissRequest = onLater,
         dismissText = "따로 두기",
@@ -98,7 +98,7 @@ fun MergeDialog(
     ) {
         BodyText(
             "위젯으로 등록한 곳이 '${target.name ?: target.address ?: "이름 없음"}'에서 " +
-                "${formatDistance(candidate.distanceM)} 떨어져 있어요.\n합치면 방문 기록이 이전 장소로 옮겨져요.",
+                "${formatDistance(candidate.distanceM)} 떨어져 있습니다.\n합치면 방문 기록이 이전 장소로 옮겨집니다.",
         )
     }
 }
@@ -106,7 +106,7 @@ fun MergeDialog(
 @Composable
 fun DeleteConfirmDialog(place: PlaceWithStats, onDelete: () -> Unit, onDismiss: () -> Unit) {
     AppDialog(
-        title = "장소를 삭제할까요?",
+        title = "장소를 삭제하시겠습니까?",
         onDismissRequest = onDismiss,
         dismissText = "취소",
         onDismissClick = onDismiss,
@@ -114,7 +114,7 @@ fun DeleteConfirmDialog(place: PlaceWithStats, onDelete: () -> Unit, onDismiss: 
         onConfirm = onDelete,
         confirmColor = DangerRed,
     ) {
-        BodyText("'${place.name ?: place.address ?: "이름 없음"}'과 방문 기록이 지도와 목록에서 사라져요.")
+        BodyText("'${place.name ?: place.address ?: "이름 없음"}'과 방문 기록이 지도와 목록에서 삭제됩니다.")
     }
 }
 

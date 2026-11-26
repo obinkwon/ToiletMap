@@ -95,8 +95,8 @@ fun SettingsRoute(onBack: () -> Unit) {
                     // "wt": 기존 파일에 덮어쓸 때 뒤에 옛 내용이 남지 않게 잘라낸다
                     context.contentResolver.openOutputStream(uri, "wt")!!.use { it.write(json.toByteArray()) }
                 }
-            }.onSuccess { toast("백업 파일을 저장했어요") }
-                .onFailure { toast("저장하지 못했어요: ${it.message}") }
+            }.onSuccess { toast("백업 파일을 저장했습니다") }
+                .onFailure { toast("저장하지 못했습니다: ${it.message}") }
         }
     }
 
@@ -108,8 +108,8 @@ fun SettingsRoute(onBack: () -> Unit) {
                     context.contentResolver.openInputStream(uri)!!.use { it.readBytes().toString(Charsets.UTF_8) }
                 }
                 app.repository.importBackup(text)
-            }.onSuccess { toast("장소 ${it}곳을 가져왔어요") }
-                .onFailure { toast("가져오지 못했어요: ${it.message}") }
+            }.onSuccess { toast("장소 ${it}곳을 가져왔습니다") }
+                .onFailure { toast("가져오지 못했습니다: ${it.message}") }
         }
     }
 
@@ -135,7 +135,7 @@ fun SettingsRoute(onBack: () -> Unit) {
 
     if (confirmImport) {
         AppDialog(
-            title = "백업을 가져올까요?",
+            title = "백업을 가져오시겠습니까?",
             onDismissRequest = { confirmImport = false },
             dismissText = "취소",
             onDismissClick = { confirmImport = false },
@@ -145,7 +145,7 @@ fun SettingsRoute(onBack: () -> Unit) {
                 importLauncher.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
             },
         ) {
-            BodyText("백업에 있는 장소는 지금 앱에 추가되고, 같은 장소는 백업 내용으로 바뀌어요. 걱정되면 먼저 내보내기를 해 두세요.")
+            BodyText("백업에 있는 장소는 지금 앱에 추가되고, 같은 장소는 백업 내용으로 바뀝니다. 걱정되면 먼저 내보내기를 해 두십시오.")
         }
     }
 }
@@ -176,7 +176,7 @@ fun SettingsScreen(
             Text("설정", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Ink)
         }
 
-        Section("위치 권한", "위젯과 현재 위치 등록에는 '앱 사용 중에만 허용' 이상이 필요해요.") {
+        Section("위치 권한", "위젯과 현재 위치 등록에는 '앱 사용 중에만 허용' 이상이 필요합니다.") {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     if (permissionGranted) "허용됨" else "허용 안 됨",
@@ -193,7 +193,7 @@ fun SettingsScreen(
 
         HorizontalDivider(color = DividerColor)
 
-        Section("중복 감지 반경", "등록할 때 이 거리 안에 이전 장소가 있으면 방문 추가할지 물어봐요.") {
+        Section("중복 감지 반경", "등록할 때 이 거리 안에 이전 장소가 있으면 방문 추가 여부를 묻습니다.") {
             Row(
                 Modifier.fillMaxWidth().background(Fill, RoundedCornerShape(12.dp)).padding(4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -223,7 +223,7 @@ fun SettingsScreen(
 
         HorizontalDivider(color = DividerColor)
 
-        Section("백업", "모든 장소와 방문 기록을 JSON 파일로 저장하거나 불러와요. 비밀번호도 파일에 그대로 들어가니 보관에 주의하세요.") {
+        Section("백업", "모든 장소와 방문 기록을 JSON 파일로 저장하거나 불러옵니다. 비밀번호도 파일에 그대로 들어가니 보관에 주의하십시오.") {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = onExport, modifier = Modifier.weight(1f).height(48.dp)) { Text("내보내기", color = Ink) }
                 OutlinedButton(onClick = onImport, modifier = Modifier.weight(1f).height(48.dp)) { Text("가져오기", color = Ink) }

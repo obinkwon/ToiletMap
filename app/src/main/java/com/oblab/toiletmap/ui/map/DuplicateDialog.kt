@@ -13,7 +13,7 @@ fun DuplicateDialog(
 ) {
     val place = candidate.place
     AppDialog(
-        title = "근처에 등록한 장소가 있어요",
+        title = "근처에 등록한 장소가 있습니다",
         subtitle = "${place.name ?: place.address ?: "이름 없음"} · ${formatDistance(candidate.distanceM)}",
         onDismissRequest = onDismiss,
         dismissText = "새 장소로 등록",
@@ -21,6 +21,6 @@ fun DuplicateDialog(
         confirmText = "방문 추가",
         onConfirm = onAddVisit,
     ) {
-        BodyText("같은 화장실이면 이 장소에 방문을 추가할까요?")
+        BodyText("같은 화장실이면 이 장소에 방문을 추가하시겠습니까?")
     }
 }

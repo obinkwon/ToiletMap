@@ -51,26 +51,26 @@ private class StepText(val title: String, val body: String, val primary: String?
 
 private fun textFor(step: RegisterStep) = when (step) {
     RegisterStep.NEED_PERMISSION -> StepText(
-        "위치 권한이 필요해요",
-        "화장실 위치를 저장하려면\n'앱 사용 중에만 허용' 이상으로 허용해 주세요.",
+        "위치 권한이 필요합니다",
+        "화장실 위치를 저장하려면\n'앱 사용 중에만 허용' 이상으로 허용해 주십시오.",
         "허용하기",
         "취소",
     )
     RegisterStep.CONFIRM -> StepText(
-        "현재 위치를 등록할까요?",
-        "지금 있는 곳을 화장실로 저장해요.\n위치와 이름은 나중에 앱에서 고칠 수 있어요.",
+        "현재 위치를 등록하시겠습니까?",
+        "지금 있는 곳을 화장실로 저장합니다.\n위치와 이름은 나중에 앱에서 고칠 수 있습니다.",
         "등록",
         "취소",
     )
     RegisterStep.FINDING -> StepText(
         "위치 찾는 중…",
-        "잠시만 기다려 주세요.\n건물 안에서는 조금 더 걸릴 수 있어요.",
+        "잠시만 기다려 주십시오.\n건물 안에서는 조금 더 걸릴 수 있습니다.",
         null,
         "취소",
     )
     RegisterStep.DONE -> StepText(
-        "등록했어요",
-        "앱 지도에서 이름·비밀번호·메모를\n넣을 수 있어요.",
+        "등록했습니다",
+        "앱 지도에서 이름·비밀번호·메모를\n넣을 수 있습니다.",
         "앱에서 보기",
         "닫기",
     )
@@ -141,7 +141,7 @@ fun RegisterSheet(step: RegisterStep, onDismiss: () -> Unit, onPrimary: () -> Un
                     }
                 }
                 if (step == RegisterStep.DONE) {
-                    Text("${secondsLeft}초 뒤 자동으로 닫혀요", fontSize = 12.sp, color = SubText)
+                    Text("${secondsLeft}초 뒤 자동으로 닫힙니다", fontSize = 12.sp, color = SubText)
                 }
             }
         }

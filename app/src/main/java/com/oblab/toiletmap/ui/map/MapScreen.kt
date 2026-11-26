@@ -133,7 +133,7 @@ fun MapScreen(
                 modifier = Modifier.align(Alignment.Center).offset(y = (-18).dp).size(28.dp, 36.dp),
             )
             Text(
-                "지도를 움직여 핀을 화장실 위치에 맞추세요",
+                "지도를 움직여 핀을 화장실 위치에 맞추십시오",
                 Modifier
                     .align(Alignment.TopCenter)
                     .statusBarsPadding()

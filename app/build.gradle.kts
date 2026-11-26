@@ -19,8 +19,8 @@ android {
         applicationId = "com.oblab.toiletmap"
         minSdk = 28
         targetSdk = 36
-        versionCode = 4
-        versionName = "0.1.0"
+        versionCode = 5
+        versionName = "0.1.1"
 
         // 카카오맵 네이티브 라이브러리는 ARM용만 있다. x86 라이브러리가 섞이면 x86_64 에뮬레이터가 x86을 골라 크래시
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }

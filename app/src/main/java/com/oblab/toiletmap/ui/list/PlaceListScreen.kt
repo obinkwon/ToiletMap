@@ -129,8 +129,8 @@ fun PlaceListScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                Text("'$q' 검색 결과가 없어요", fontSize = 15.sp, fontWeight = FontWeight.Medium, color = Ink, textAlign = TextAlign.Center)
-                Text("이름을 지정하지 않은 장소는 주소로 찾아보세요", fontSize = 13.sp, color = SubText, textAlign = TextAlign.Center)
+                Text("'$q' 검색 결과가 없습니다", fontSize = 15.sp, fontWeight = FontWeight.Medium, color = Ink, textAlign = TextAlign.Center)
+                Text("이름을 지정하지 않은 장소는 주소로 찾아보십시오", fontSize = 13.sp, color = SubText, textAlign = TextAlign.Center)
             }
         } else {
             LazyColumn {
